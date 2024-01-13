@@ -8,7 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class ExpenseController
 {
     #[Route("/api/expenses")]
-    public function getExpenses() : Response
+    public function getExpenses(): Response
     {
         die("getExpenses is not implemented");
     }
