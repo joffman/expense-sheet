@@ -3,46 +3,52 @@
 namespace App\Controller;
 
 use App\Entity\Expense;
+use App\Repository\ExpenseRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ExpenseApiController extends AbstractController
 {
     #[Route("/api/expenses", methods: ["GET"])]
-    public function getExpenses(LoggerInterface $logger): JsonResponse
+    public function getExpenses(LoggerInterface $logger, ExpenseRepository $repository): JsonResponse
     {
-        $expenses = [
-            [
-                "title" => "Einkaufen",
-                "cost" => 15,
-                "date" => date("Y-m-d", mktime(0, 0, 0, 12, 5, 2023))
-            ],
-            [
-                "title" => "Putzfrau",
-                "cost" => 45,
-                "date" => date("Y-m-d", mktime(0, 0, 0, 1, 3, 2024))
-            ],
-        ];
+        $expenses = $repository->findAll();
+
+        $data = [];
+        foreach ($expenses as $expense) {
+            $data[] = [
+                "id" => $expense->getId(),
+                "name" => $expense->getName(),
+                "date" => $expense->getDate(),
+                "costs" => $expense->getCosts(),
+                "paymentSource" => $expense->getPaymentSource(),
+            ];
+        }
 
         $logger->info("Return {expenseCount} expenses", [
             "expenseCount" => count($expenses)
         ]);
 
-        return $this->json($expenses);
+        return $this->json($data);
     }
 
     #[Route("/api/expenses", methods: ["POST"])]
-    public function create(EntityManagerInterface $entityManager): Response
+    public function create(EntityManagerInterface $entityManager, Request $request): Response
     {
+        // todo handle invalid input data (send 400 reponse).
+        $requestData = json_decode($request->getContent(), true);
+        $date = \DateTimeImmutable::createFromFormat("Ymd", $requestData["date"]);
+
         $expense = new Expense();
-        $expense->setName("Putzfrau");
-        $expense->setDate(new \DateTimeImmutable());
-        $expense->setCosts(45);
-        $expense->setPaymentSource("Janosch");
+        $expense->setName($requestData["name"]);
+        $expense->setDate($date);
+        $expense->setCosts($requestData["costs"]);
+        $expense->setPaymentSource($requestData["paymentSource"]);
 
         $entityManager->persist($expense);
         $entityManager->flush();
