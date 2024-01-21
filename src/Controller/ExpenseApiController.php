@@ -2,9 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\Expense;
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ExpenseApiController extends AbstractController
@@ -30,5 +33,24 @@ class ExpenseApiController extends AbstractController
         ]);
 
         return $this->json($expenses);
+    }
+
+    #[Route("/api/expenses", methods: ["POST"])]
+    public function create(EntityManagerInterface $entityManager): Response
+    {
+        $expense = new Expense();
+        $expense->setName("Putzfrau");
+        $expense->setDate(new \DateTimeImmutable());
+        $expense->setCosts(45);
+        $expense->setPaymentSource("Janosch");
+
+        $entityManager->persist($expense);
+        $entityManager->flush();
+
+        $responseData = [
+            "id" => $expense->getId()
+        ];
+
+        return $this->json($responseData);
     }
 }

@@ -7,4 +7,42 @@
     <h1>Expense Sheet</h1>
     <p>Some text</p>
     <p>TODO: Put the react SPA in here.</p>
+    <button class="fetch-button">Fetch expenses</button>
+    <button class="create-button">Create expense</button>
+    <button class="update-button">Update expense</button>
+    <button class="delete-button">Delete expense</button>
+
+    <script>
+        const fetchButton = document.querySelector("button.fetch-button");
+        fetchButton.addEventListener("click", async () => {
+           console.log("Fetch clicked");
+            const response = await fetch("/api/expenses");
+            const data = await response.json();
+            console.log(response);
+            console.log("data", data);
+        });
+
+        const createButton = document.querySelector("button.create-button");
+        createButton.addEventListener("click", async () => {
+            console.log("Create clicked");
+
+            const newExpense = {
+                name: "Test Expense",
+                costs: 155.55,
+                date: "20231205",
+            };
+
+            const response = await fetch("/api/expenses", {
+               method: "POST",
+               headers: {
+                   "Content-Type": "application/json",
+               },
+                body: JSON.stringify(newExpense),
+            });
+            const responseData = await response.json();
+
+            console.log("response:", response);
+            console.log("responseData:", responseData);
+        });
+    </script>
 {% endblock %}
