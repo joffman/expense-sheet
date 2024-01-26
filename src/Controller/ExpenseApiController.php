@@ -13,11 +13,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /* todo
- * - get all: order by date descending
- * - get one Endpunkt
  * - update Endpunkt
  * - delete Endpunkt
  * - Error Handling
+ * - Adjust 404 error response. Don't send html. Also check behaviour for production.
  * - Authentication
  * - later: statistics
  */
@@ -45,6 +44,20 @@ class ExpenseApiController extends AbstractController
         ]);
 
         return $this->json($data);
+    }
+
+    #[Route("/api/expenses/{id}", methods: ["GET"])]
+    public function getExpenseById(Expense $expense): JsonResponse
+    {
+        $expenseData = [
+            "id" => $expense->getId(),
+            "name" => $expense->getName(),
+            "date" => $expense->getDate(),
+            "costs" => $expense->getCosts(),
+            "paymentSource" => $expense->getPaymentSource(),
+        ];
+
+        return $this->json($expenseData);
     }
 
     #[Route("/api/expenses", methods: ["POST"])]
