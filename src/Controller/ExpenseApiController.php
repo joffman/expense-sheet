@@ -13,10 +13,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /* todo
- * - update Endpunkt
- * - Error Handling
  * - Adjust 404 error response. Don't send html. Also check behaviour for production.
  * - Authentication
+ * - Add comment field.
  * - later: statistics
  */
 
@@ -59,6 +58,42 @@ class ExpenseApiController extends AbstractController
         return $this->json($expenseData);
     }
 
+    #[Route("/api/expenses/{id}", methods: ["POST"])]
+    public function updateExpense($id, ExpenseRepository $repository, EntityManagerInterface $entityManager, Request $request): JsonResponse
+    {
+        $requestData = json_decode($request->getContent(), true);
+
+        if (is_null($requestData)) {
+            return new JsonResponse(["error" => "Request body is not valid JSON"], 400);
+        }
+
+        $date = \DateTimeImmutable::createFromFormat("Ymd", $requestData["date"]);
+        if ($date === false) {
+            return new JsonResponse(["error" => "Invalid date format"], 400);
+        }
+
+        $expense = $repository->find($id);
+        if (is_null($expense)) {
+            return new JsonResponse(["error" => "expense object does not exist"], 400);
+        }
+
+        try {
+            $expense->setName($requestData["name"] ?? null);
+            $expense->setDate($date);
+            $expense->setCosts($requestData["costs"] ?? null);
+            $expense->setPaymentSource($requestData["paymentSource"] ?? null);
+        } catch (\TypeError $e) {
+            return new JsonResponse(["error" => "Invalid inputs: " . $e], 400);
+        }
+
+        $entityManager->flush();
+
+        $responseData = [
+            "success" => true,
+        ];
+        return $this->json($responseData);
+    }
+
     #[Route("/api/expenses/{id}", methods: ["DELETE"])]
     public function deleteExpense(Expense $expense, EntityManagerInterface $entityManager): JsonResponse
     {
@@ -73,17 +108,17 @@ class ExpenseApiController extends AbstractController
     }
 
     #[Route("/api/expenses", methods: ["POST"])]
-    public function create(EntityManagerInterface $entityManager, Request $request): Response
+    public function create(EntityManagerInterface $entityManager, Request $request): JsonResponse
     {
         $requestData = json_decode($request->getContent(), true);
 
         if (is_null($requestData)) {
-            return new Response("Request body is not valid JSON", 400);
+            return new JsonResponse(["error" => "Request body is not valid JSON"], 400);
         }
 
         $date = \DateTimeImmutable::createFromFormat("Ymd", $requestData["date"]);
         if ($date === false) {
-            return new Response("Invalid date format", 400);
+            return new JsonResponse(["error" => "Invalid date format"], 400);
         }
 
         $expense = new Expense();
@@ -93,7 +128,7 @@ class ExpenseApiController extends AbstractController
             $expense->setCosts($requestData["costs"] ?? null);
             $expense->setPaymentSource($requestData["paymentSource"] ?? null);
         } catch (\TypeError $e) {
-            return new Response("Invalid inputs: " . $e, 400);
+            return new JsonResponse(["error" => "Invalid inputs: " . $e], 400);
         }
 
         $entityManager->persist($expense);
