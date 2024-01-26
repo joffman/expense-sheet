@@ -27,8 +27,7 @@ class ExpenseApiController extends AbstractController
     #[Route("/api/expenses", methods: ["GET"])]
     public function getExpenses(LoggerInterface $logger, ExpenseRepository $repository): JsonResponse
     {
-        // todo order by date descending.
-        $expenses = $repository->findAll();
+        $expenses = $repository->findBy([], ["date" => "DESC"]);
 
         $data = [];
         foreach ($expenses as $expense) {
