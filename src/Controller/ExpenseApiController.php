@@ -12,11 +12,22 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+/* todo
+ * - get all: order by date descending
+ * - get one Endpunkt
+ * - update Endpunkt
+ * - delete Endpunkt
+ * - Error Handling
+ * - Authentication
+ * - later: statistics
+ */
+
 class ExpenseApiController extends AbstractController
 {
     #[Route("/api/expenses", methods: ["GET"])]
     public function getExpenses(LoggerInterface $logger, ExpenseRepository $repository): JsonResponse
     {
+        // todo order by date descending.
         $expenses = $repository->findAll();
 
         $data = [];
@@ -40,15 +51,26 @@ class ExpenseApiController extends AbstractController
     #[Route("/api/expenses", methods: ["POST"])]
     public function create(EntityManagerInterface $entityManager, Request $request): Response
     {
-        // todo handle invalid input data (send 400 reponse).
         $requestData = json_decode($request->getContent(), true);
+
+        if (is_null($requestData)) {
+            return new Response("Request body is not valid JSON", 400);
+        }
+
         $date = \DateTimeImmutable::createFromFormat("Ymd", $requestData["date"]);
+        if ($date === false) {
+            return new Response("Invalid date format", 400);
+        }
 
         $expense = new Expense();
-        $expense->setName($requestData["name"]);
-        $expense->setDate($date);
-        $expense->setCosts($requestData["costs"]);
-        $expense->setPaymentSource($requestData["paymentSource"]);
+        try {
+            $expense->setName($requestData["name"] ?? null);
+            $expense->setDate($date);
+            $expense->setCosts($requestData["costs"] ?? null);
+            $expense->setPaymentSource($requestData["paymentSource"] ?? null);
+        } catch (\TypeError $e) {
+            return new Response("Invalid inputs: " . $e, 400);
+        }
 
         $entityManager->persist($expense);
         $entityManager->flush();
