@@ -14,7 +14,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 /* todo
  * - update Endpunkt
- * - delete Endpunkt
  * - Error Handling
  * - Adjust 404 error response. Don't send html. Also check behaviour for production.
  * - Authentication
@@ -58,6 +57,19 @@ class ExpenseApiController extends AbstractController
         ];
 
         return $this->json($expenseData);
+    }
+
+    #[Route("/api/expenses/{id}", methods: ["DELETE"])]
+    public function deleteExpense(Expense $expense, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $entityManager->remove($expense);
+        $entityManager->flush();
+
+        $responseData = [
+            "success" => true,
+        ];
+
+        return $this->json($responseData);
     }
 
     #[Route("/api/expenses", methods: ["POST"])]
