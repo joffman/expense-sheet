@@ -13,7 +13,7 @@ export function ExpensesOverview() {
         {
             id: 2,
             date: new Date(),
-            name: "Expense 2",
+            name: "Expense 2 with very long name lalalallaa and some more",
             costs: 23.5,
             paymentSource: "Janosch",
         },
