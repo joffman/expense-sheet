@@ -1,18 +1,18 @@
 import React from "react";
 import {
-    BrowserRouter, Link, Route, Routes,
+    BrowserRouter, Route, Routes,
 } from "react-router-dom";
+import {ExpensesOverview} from "./ExpensesOverview/ExpensesOverview";
+import {ExpenseDetails} from "./ExpenseDetails/ExpenseDetails";
 
 
 export function ExpenseSheetApp() {
     return (
         <div>
-            <h1>Expense Sheet</h1>
-            <p>More to come</p>
             <BrowserRouter>
                 <Routes>
-                    <Route path={"/expenses?"} element={<div>Index page <Link to={"expenses"}>Go to expenses</Link></div>}/>
-                    <Route path={"expenses/:expenseId"} element={<div>Single Expense</div>}/>
+                    <Route path={"/expenses?"} element={<ExpensesOverview />}/>
+                    <Route path={"expenses/:expenseId"} element={<ExpenseDetails />}/>
                 </Routes>
             </BrowserRouter>
         </div>
