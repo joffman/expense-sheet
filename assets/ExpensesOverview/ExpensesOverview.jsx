@@ -1,4 +1,5 @@
 import React from "react";
+import AddBoxRoundedIcon from '@mui/icons-material/AddBoxRounded';
 import {ExpenseListElement} from "../ExpenseListElement/ExpenseListElement";
 
 export function ExpensesOverview() {
@@ -26,11 +27,19 @@ export function ExpensesOverview() {
         },
     ];
 
+    function handleAddExpenseClick() {
+        console.log("handleAddExpenseClick");
+    }
+
     return (
         <div>
             <h1>Expenses Overview</h1>
 
-            <button>Add expense</button>
+            <AddBoxRoundedIcon
+                color={"primary"}
+                fontSize={"large"}
+                onClick={handleAddExpenseClick}
+            />
 
             {expenses.map(element => (
                 <ExpenseListElement key={element.id} expense={element} />
