@@ -8,7 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class IndexController extends AbstractController
 {
-    #[Route("/", name: "app_index")]
+    #[Route("/{wildcard}", name: "app_index", requirements: ["wildcard" => ".*"])]
     public function index(): Response
     {
         return $this->render("index.html.twig", []);
