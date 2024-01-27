@@ -30,6 +30,8 @@ export function ExpensesOverview() {
         <div>
             <h1>Expenses Overview</h1>
 
+            <button>Add expense</button>
+
             {expenses.map(element => (
                 <ExpenseListElement key={element.id} expense={element} />
             ))}
