@@ -2,7 +2,7 @@ $padding-horizontal: 5px;
 $padding-vertical: 5px;
 
 .ExpenseListElement {
-    background-color: #cccccc;
+    background-color: #d4e7fa;
     border-radius: 5px;
     display: flex;
     min-height: 50px;
@@ -12,6 +12,7 @@ $padding-vertical: 5px;
 .ExpenseListElement-primaryInfo {
     display: flex;
     flex-direction: column;
+    gap: 10px;
     justify-content: space-between;
     min-height: inherit;
     padding: 5px;
@@ -24,6 +25,7 @@ $padding-vertical: 5px;
 .ExpenseListElement-secondaryInfo {
     display: flex;
     flex-direction: column;
+    gap: 10px;
     min-height: inherit;
     justify-content: space-between;
     padding: 5px;
@@ -31,7 +33,9 @@ $padding-vertical: 5px;
 
 .ExpenseListElement-date {}
 
-.ExpenseListElement-costs {}
+.ExpenseListElement-costs {
+    font-weight: bold;
+}
 
 .ExpenseListElement-name {}
 
